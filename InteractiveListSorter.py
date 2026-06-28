@@ -1,11 +1,37 @@
 import itertools as it
 from random import shuffle
+from os import system, get_terminal_size
 
-def interactiveListSorter(dictionary: dict) -> dict:
+def printProgressBar (iteration: int, total: int, prefix: str = '', suffix: str = '', decimals: int = 1, length: int = 100, fill: str = '█', printEnd: str = "\r") -> None:
+    """
+    Call in a loop to create terminal progress bar
+    @params:
+        iteration   - Required  : current iteration (Int)
+        total       - Required  : total iterations (Int)
+        prefix      - Optional  : prefix string (Str)
+        suffix      - Optional  : suffix string (Str)
+        decimals    - Optional  : positive number of decimals in percent complete (Int)
+        length      - Optional  : character length of bar (Int)
+        fill        - Optional  : bar fill character (Str)
+        printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
+    """
+    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+    filledLength = int(length * iteration // total)
+    bar = fill * filledLength + '-' * (length - filledLength)
+    newline = f'{percent}%{suffix}'.center(get_terminal_size().columns)
+    print(f'\r{prefix}|{bar}|\n{newline}', end = printEnd)
+    # Print New Line on Complete
+    if iteration == total: 
+        print()
+
+def interactiveListSorter(dictionary: dict[str,int]) -> dict[str,int]:
     comp_list = list(it.combinations(dictionary, 2))
     shuffle(comp_list)
+    list_len = len(comp_list)
 
-    for index in range(len(comp_list)):
+    for index in range(list_len):
+        system("clear")
+        printProgressBar(iteration=index, total=list_len, suffix=" Complete", length=((get_terminal_size().columns)-2), printEnd="\n")
         while True:
             try:
                 pref = int(input(f'Type "1" if you prefer {comp_list[index][0]} or "2" if you prefer {comp_list[index][1]}\n'))
@@ -23,7 +49,7 @@ def interactiveListSorter(dictionary: dict) -> dict:
 
     return dict(sorted(dictionary.items(), key=lambda item: item[1], reverse=True))
 
-def manual_list() -> dict:
+def manual_list() -> dict[str,int]:
     things = {}
     user_input = input('Type what you want to put in the list; after one entry, press enter; when you\'re done, press enter without having typed anything:\n')
     while user_input != '':
@@ -31,7 +57,7 @@ def manual_list() -> dict:
         user_input = input()
     return things
 
-def auto_list(filename) -> dict:
+def auto_list(filename: str) -> dict[str,int]:
     with open(filename, "r") as file:
         text = file.read()
     keys = text.splitlines()
@@ -66,6 +92,7 @@ if __name__ == '__main__':
     sorted_things_as_list = list(sorted_things)
     #print(sorted_things)
     #print(sorted_things_as_list)
+    system("clear")
     print('Here is how your list of items rank according to your preferences:')
     rank = 1
     rankskip = 1
